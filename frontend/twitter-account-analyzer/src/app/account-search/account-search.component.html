@@ -1,1 +1,12 @@
-<p>SEARCH HERE</p>
+<div id="search-container">
+    <p>Search for a Twitter user by their account handle!</p>
+    <div class="hstack">
+        <mat-form-field appearance="outline" floatLabel="always">
+            <input matInput autocorrect="off" placeholder="account-handle"/>
+            <span id="prefix" matPrefix>&#64;</span>
+            <button matSuffix mat-icon-button aria-label="Search">
+                <mat-icon>search</mat-icon>
+            </button>
+        </mat-form-field>
+    </div>
+</div>
