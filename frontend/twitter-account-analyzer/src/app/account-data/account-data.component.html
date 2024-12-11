@@ -1,0 +1,11 @@
+<div id="account-container">
+    <p>Account Data</p>
+
+    <div class="hstack">
+        <img [src]="pfpLarge" alt="Profile Picture" class="circle">
+        <div class="vstack">
+            <p><b>{{ accountData?.displayName ?? '-' }}</b></p>
+            <p><i>&#64;{{ username }}</i></p>
+        </div>
+    </div>
+</div>

@@ -180,7 +180,8 @@ class AccountAnalysis(APIView):
         accountData["posts"].update(posts)
         return Response({
             "profile" : accountData["profile"],
-            "analysis" : analysis
+            "analysis" : analysis,
+            "posts" : posts
         })
 
 # just get the basic account data

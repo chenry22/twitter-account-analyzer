@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "account-analyzer-frontend": {
+    "twitter-account-analyzer": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/account-analyzer-frontend",
+            "outputPath": "dist/twitter-account-analyzer",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -60,10 +60,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "account-analyzer-frontend:build:production"
+              "buildTarget": "twitter-account-analyzer:build:production"
             },
             "development": {
-              "buildTarget": "account-analyzer-frontend:build:development"
+              "buildTarget": "twitter-account-analyzer:build:development"
             }
           },
           "defaultConfiguration": "development"

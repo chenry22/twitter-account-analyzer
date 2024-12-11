@@ -1,5 +1,6 @@
 /backend/api_key.txt
 /backend/firebase.json
+*.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

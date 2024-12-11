@@ -1,0 +1,10 @@
+#account-container {
+    margin: 10px 40px;
+}
+
+.circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+}
