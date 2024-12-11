@@ -1,6 +1,9 @@
 #search-container {
-    margin: 20px 40px;
+    text-align: center;
 }
 #prefix {
-    margin-left: 10px;
+    margin-left: 20px;
+}
+#search-button {
+    margin-right: 10px;
 }

@@ -1,17 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountDataService } from '../account-data.service';
 import { Account } from '../account-data';
-import { ActivatedRoute } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
+import { ActivatedRoute, Router } from '@angular/router';
+
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-account-data',
-  imports: [MatToolbarModule],
+  imports: [MatIconModule, MatButtonModule],
   templateUrl: './account-data.component.html',
   styleUrl: './account-data.component.css'
 })
 export class AccountDataComponent implements OnInit {
-  constructor(private route: ActivatedRoute, private accountDataService: AccountDataService) { }
+  constructor(private router: Router, private route: ActivatedRoute, private accountDataService: AccountDataService) { }
   username: string = "-";
   pfpLarge: string = "";
   accountData: Account|null = null;
@@ -24,7 +26,13 @@ export class AccountDataComponent implements OnInit {
       this.getAccountData();
     } else {
       console.log("invalid username request")
+      alert("That user does not exist...")
+      this.backToMain()
     }
+  }
+
+  backToMain(): void {
+    this.router.navigate(['/'])
   }
 
   getAccountData() {

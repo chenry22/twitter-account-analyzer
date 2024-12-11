@@ -2,6 +2,10 @@
     margin: 10px 40px;
 }
 
+#account-container div {
+    margin: 20px 70px;
+}
+
 .circle {
     width: 100px;
     height: 100px;
