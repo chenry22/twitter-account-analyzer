@@ -21,5 +21,5 @@ from account_analyzer import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'api/v1/accountSummary/(?P<accountHandle>\w+)/$', views.AccountSummary.as_view(), name="account_summary"),
-    re_path(r'api/v1/accountAnalyzer/(?P<accountHandle>\w+)/$', views.AccountAnalyzer.as_view(), name="account_analyzer")
+    re_path(r'api/v1/accountAnalysis/(?P<accountHandle>\w+)/$', views.AccountAnalysis.as_view(), name="account_analyzer")
 ]
