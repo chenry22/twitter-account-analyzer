@@ -3,11 +3,69 @@
         <mat-icon>chevron_left</mat-icon>Back
     </button>
 
-    <div class="hstack">
-        <img [src]="pfpLarge" alt="Profile Picture" class="circle">
-        <div class="vstack">
-            <p><b>{{ accountData?.displayName ?? '-' }}</b></p>
-            <p><i>&#64;{{ username }}</i></p>
-        </div>
+    <div class="header-container">
+        <mat-card id="profile-card" appearance="outlined">
+            <mat-card-header class="align-vertical">
+                <img class="avatar" mat-card-avatar [src]="pfpLarge" alt="profile picture">
+                <div class="hstack account-info">
+                    <div>
+                        <p><b>{{ accountData?.displayName ?? '-' }}</b></p>
+                        <p><i>&#64;{{ username }}</i></p>
+                    </div>
+                    <div>
+                        <p>{{ accountData?.followers ?? '-' }}</p>
+                        <p>Followers</p>
+                    </div>
+                    <div>
+                        <p>{{ accountData?.following ?? '-' }}</p>
+                        <p>Following</p>
+                    </div>
+                    <div>
+                        <p>Account Created</p>
+                        <p>{{ accountData?.created ?? '---' }}</p>
+                    </div>
+                </div>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="hstack align-vertical">
+                    <mat-icon>location_on</mat-icon>
+                    <p><i>{{ accountData?.location ?? '---' }}</i></p>
+                    <span class="spacer"></span>
+                </div>
+                <p>{{ accountData?.bio ?? '[ No bio ]' }}</p>
+            </mat-card-content>
+
+            <mat-card-actions class="bottom-card-button">
+                <button mat-button>Visit Profile</button>
+            </mat-card-actions>
+        </mat-card>
+
+        <div id="card-spacer"></div>
+
+        <mat-card id="stats-card" appearance="outlined">
+            <mat-card-header>
+                <mat-card-title><b>Account Analysis</b></mat-card-title>
+                <mat-card-subtitle><i>Last Updated: {{ accountData?.lastUpdated ?? '---' }}</i></mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="analysis-row hstack">
+                    <span class="spacer"></span>
+                    <analysis-donut [analysis]="analysis?.sentiment"></analysis-donut>
+                    <analysis-donut [analysis]="analysis?.emotions"></analysis-donut>
+                    <analysis-donut [analysis]="analysis?.topics"></analysis-donut>
+                    <span class="spacer"></span>
+                </div>
+                <div class="analysis-row hstack">
+                    <span class="spacer"></span>
+                    <analysis-donut [analysis]="analysis?.irony"></analysis-donut>
+                    <analysis-donut [analysis]="analysis?.hate"></analysis-donut>
+                    <analysis-donut [analysis]="analysis?.offensive"></analysis-donut>
+                    <span class="spacer"></span>
+                </div>
+            </mat-card-content>
+            <mat-card-actions class="bottom-card-button">
+                <button mat-button>Save</button>
+            </mat-card-actions>
+        </mat-card>
     </div>
 </div>

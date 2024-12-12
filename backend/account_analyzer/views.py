@@ -181,7 +181,6 @@ class AccountAnalysis(APIView):
         return Response({
             "profile" : accountData["profile"],
             "analysis" : analysis,
-            "posts" : posts
         })
 
 # just get the basic account data

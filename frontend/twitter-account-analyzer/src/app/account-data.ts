@@ -1,3 +1,65 @@
+export interface EmotionAnalysis {
+    anger: number,
+    anticipation: number,
+    disgust: number,
+    fear: number,
+    joy: number,
+    love: number,
+    optimism: number,
+    pessimism: number,
+    sadness: number,
+    surprise: number,
+    trust: number,
+}
+export interface HateAnalysis {
+    hate: number,
+    not_hate: number,
+}
+export interface IronyAnalysis {
+    irony: number,
+    non_irony: number,
+}
+export interface OffensiveAnalysis {
+    offensive: number,
+    'non-offensive': number,
+}
+export interface SentimentAnalysis {
+    negative: number,
+    neutral: number,
+    positive: number
+}
+export interface TopicAnalysis {
+    'arts_&_culture': number,
+    'fashion_&_style': number,
+    'learning_&_educational': number,
+    'science_&_technology': number,
+    'business_&_entrepreneurs': number,
+    'film_tv_&_video': number,
+    music: number,
+    sports: number,
+    'celebrity_&_pop_culture': number,
+    'fitness_&_health': number,
+    'news_&_social_concern': number,
+    'travel_&_adventure': number,
+    'diaries_&_daily_life': number,
+    'food_&_dining': number,
+    'other_hobbies': number,
+    'youth_&_student_life': number,
+    family: number,
+    gaming: number,
+    relationships: number
+}
+
+
+
+export interface Analysis {
+    emotions: EmotionAnalysis,
+    hate: HateAnalysis,
+    irony: IronyAnalysis,
+    offensive: OffensiveAnalysis,
+    sentiment: SentimentAnalysis,
+    topics: TopicAnalysis,
+}
 export interface Account {
     accountID: string,
     bio: string,
@@ -12,5 +74,7 @@ export interface Account {
     url: string,
     verified: boolean
 }
-
-export interface AccountArray extends Array<Account> { }
+export interface AccountAnalysis {
+    profile: Account,
+    analysis: Analysis
+}

@@ -1,0 +1,22 @@
+.analysis-card {
+    flex: 0 0 33.3333%;
+    max-width: 250px;
+    height: 250px;
+}
+
+.chart-container {
+    position: relative;
+}
+.donut-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.donut-icon mat-icon {
+    vertical-align: middle;
+}

@@ -1,14 +1,33 @@
 #account-container {
     margin: 10px 40px;
 }
-
-#account-container div {
+.header-container {
     margin: 20px 70px;
 }
-
-.circle {
+#profile-card {
+    padding: 20px;
+}
+.avatar {
     width: 100px;
     height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
+    border: 2px solid darkslategray;
+}
+.account-info {
+    margin: 0 20px;
+    gap: 50px;
+}
+.align-vertical {
+    align-items: center;
+}
+.bottom-card-button {
+    margin-top: 20px;
+}
+#card-spacer {
+    height: 40px;
+}
+#stats-card {
+    padding: 20px;
+}
+.analysis-row {
+    margin: 10px auto;
 }
