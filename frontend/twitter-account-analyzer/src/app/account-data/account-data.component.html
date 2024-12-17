@@ -13,16 +13,16 @@
                         <p><i>&#64;{{ username }}</i></p>
                     </div>
                     <div>
-                        <p>{{ accountData?.followers ?? '-' }}</p>
+                        <p><b>{{ accountData?.followers ?? '-' }}</b></p>
                         <p>Followers</p>
                     </div>
                     <div>
-                        <p>{{ accountData?.following ?? '-' }}</p>
+                        <p><b>{{ accountData?.following ?? '-' }}</b></p>
                         <p>Following</p>
                     </div>
                     <div>
                         <p>Account Created</p>
-                        <p>{{ accountData?.created ?? '---' }}</p>
+                        <p><b>{{ accountData?.created ?? '---' }}</b></p>
                     </div>
                 </div>
             </mat-card-header>
@@ -48,19 +48,13 @@
                 <mat-card-subtitle><i>Last Updated: {{ accountData?.lastUpdated ?? '---' }}</i></mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
-                <div class="analysis-row hstack">
-                    <span class="spacer"></span>
+                <div class="analysis-row">
                     <analysis-donut [analysis]="analysis?.sentiment"></analysis-donut>
                     <analysis-donut [analysis]="analysis?.emotions"></analysis-donut>
                     <analysis-donut [analysis]="analysis?.topics"></analysis-donut>
-                    <span class="spacer"></span>
-                </div>
-                <div class="analysis-row hstack">
-                    <span class="spacer"></span>
                     <analysis-donut [analysis]="analysis?.irony"></analysis-donut>
                     <analysis-donut [analysis]="analysis?.hate"></analysis-donut>
                     <analysis-donut [analysis]="analysis?.offensive"></analysis-donut>
-                    <span class="spacer"></span>
                 </div>
             </mat-card-content>
             <mat-card-actions class="bottom-card-button">

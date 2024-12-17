@@ -29,5 +29,15 @@
     padding: 20px;
 }
 .analysis-row {
-    margin: 10px auto;
+    margin: 20px 5px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    gap: 15px;
+    width: 100%;
+}
+
+analysis-donut {
+    width: 300px;
 }

@@ -1,16 +1,18 @@
 <mat-card class="analysis-card">
     <mat-card-header>{{ title }}</mat-card-header>
     <mat-card-content>
-        <div  class="chart-container">
+        <div class="chart-container">
             <div id="chart">
                 <apx-chart
-                    [series]="chartOptions.series"
-                    [chart]="chartOptions.chart"
-                    [labels]="chartOptions.labels"
-                    [responsive]="chartOptions.responsive"
+                    [series]="chartOptions.series!"
+                    [chart]="chartOptions.chart!"
+                    [labels]="chartOptions.labels!"
+                    [responsive]="chartOptions.responsive!"
+                    [colors]="chartOptions.colors!"
+                    [legend]="chartOptions.legend!"
                 ></apx-chart>
             </div>
-            <div class="donut-icon">
+            <div class="donut-overlay">
                 <mat-icon class="donut-icon">{{ icon }}</mat-icon>
             </div>
         </div>

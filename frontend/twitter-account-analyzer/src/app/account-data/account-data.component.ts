@@ -10,7 +10,8 @@ import { AnalysisDonutComponent } from '../analysis-donut/analysis-donut.compone
 
 @Component({
   selector: 'app-account-data',
-  imports: [MatIconModule, MatButtonModule, MatCardModule, AnalysisDonutComponent],
+  imports: [MatIconModule, MatButtonModule, 
+    MatCardModule, AnalysisDonutComponent],
   templateUrl: './account-data.component.html',
   styleUrl: './account-data.component.css'
 })
