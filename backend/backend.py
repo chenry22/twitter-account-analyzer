@@ -1,10 +1,7 @@
-from rest_framework.response import Response
-from rest_framework.views import APIView, exception_handler
-
 import pyrebase
 from apify_client import ApifyClient
-
 import requests
+
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
 from transformers import pipeline
@@ -20,9 +17,21 @@ EMOTION_MODEL = "cardiffnlp/twitter-roberta-base-emotion-multilabel-latest"
 OFFENSIVE_MODEL = "cardiffnlp/twitter-roberta-base-offensive"
 HATE_MODEL = "cardiffnlp/twitter-roberta-large-hate-latest"
 
-MAX_POSTS_FROM_API = 50 # this costs real life money, so I'm being a little restrictive
+MAX_POSTS_FROM_API = 20 # this costs real life money, so I'm being a little restrictive
 
-# set up any necessary API clients here
+# TODO
+    # get image analysis of quoted tweet (only one layer though)
+
+# TODO
+    # for sentiment, emotion, & image, just have content and image, not quote
+    # offensive, irony, and topic should include quote context
+
+# TODO
+    # word frequency + ngram frequency (probably 2-3, and only include if more than 2ish appearances)
+    # remove any @s and links, keep hashtags though
+    # weighted analysis could be cool, with some formula for impression score (views * 0.1 + likes + retweets * 2.0 + comments * 1.5)
+
+# set up necessary API clients
 with open('firebase.json', 'r') as f:
     app_config = json.load(f)
     firebase = pyrebase.initialize_app(app_config)
@@ -54,6 +63,7 @@ def get_post_content(post: dict, img_processor, img_model) -> str:
             img_processer(BlipProcessor): Processor to be used if image needs text description
             img_model(BlipForConditionalGeneration): Model to be used if image needs text description
     '''
+    post_content = str(post['contents']).split("https://")[0]
     content = None
     # check any images that need to be processed as text
     if "attachments" in post.keys():
@@ -65,7 +75,7 @@ def get_post_content(post: dict, img_processor, img_model) -> str:
 
             inputs = img_processor(image, return_tensors="pt")
             output = img_model.generate(**inputs)
-            content = f"Image: { img_processor.decode(output[0], skip_special_tokens=True) } Main: {post['contents']}"
+            content = f"Image: { img_processor.decode(output[0], skip_special_tokens=True) } Main: {post_content}"
         else:
             print(f"Failed to fetch image. Status code: {response.status_code}")
 
@@ -73,10 +83,10 @@ def get_post_content(post: dict, img_processor, img_model) -> str:
     if "quote" in post.keys():
         quote_text = post["quote"]["post"]["contents"]
         if content is None:
-            content = f"Quote Tweet: {quote_text} Main: {post['contents']}"
+            content = f"Quote Tweet: {quote_text} Main: {post_content}"
         else:
             content = f"Quote Tweet: {quote_text} " + content
-    return post["contents"] if content is None else content
+    return post_content if content is None else content
 
 def get_label_summary(items):
     ''' Converts a list of items' attributes to a dictionary of these attributes and the overall partition of these attributes in the collection 
@@ -103,96 +113,85 @@ def get_label_summary(items):
     scores = { k : round(v / score_sum, 3) for k, v in scores.items() }
     return (arranged, scores)
 
-class AccountAnalysis(APIView):
-    def get(self, request, accountHandle):
-        """ Return Twitter account analysis
+def getAccountAnalysis(accountHandle):
+    """ Return Twitter account analysis
 
-            This includes basic sentiment analysis (positivity + valence), as well
-             as detecting toxic content posted. It also includes a summary of the 
-             account's content overall. """
+        This includes basic sentiment analysis (positivity + valence), as well
+            as detecting toxic content posted. It also includes a summary of the 
+            account's content overall. """
 
-        # first check if cached result exists...
-        accountData = getAccountData(accountHandle)
-        account_id = accountData["profile"]["accountID"]
-        cached = db.child("Analysis").child(account_id).get().val()
-        if cached is not None:
-            print("Found cached data in Firebase")
-            return Response({
-                "profile" : accountData["profile"],
-                "analysis" : cached
-            })
-
-        # first get base account data + initialize models used
-        print(f"Generating new analysis of user: {accountHandle}")
-        img_processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-        img_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
-        sentiment_pipeline = pipeline("text-classification", model=BASE_MODEL)
-        irony_pipeline = pipeline("text-classification", model=IRONY_MODEL)
-        topic_pipeline = pipeline("text-classification", model=TOPIC_MODEL, top_k=5)
-        emotion_pipeline = pipeline("text-classification", model=EMOTION_MODEL, top_k=3)
-        offensive_pipeline = pipeline("text-classification", model=OFFENSIVE_MODEL)
-        hate_pipeline = pipeline("text-classification", model=HATE_MODEL)
-
-        # get full context of each post (image desc & quote tweets if applicable)
-        posts = accountData["posts"]
-        contexts = {}
-        for id, post in posts.items():
-            contexts[id] = get_post_content(post, img_processor, img_model)
-
-        # use models to get analyses of posts
-        sentiments = sentiment_pipeline(list(contexts.values()))
-        irony = irony_pipeline(list(contexts.values()))
-        topics = topic_pipeline(list(contexts.values()))
-        emotions = emotion_pipeline(list(contexts.values()))
-        offensives = offensive_pipeline(list(contexts.values()))
-        hates = hate_pipeline(list(contexts.values()))
-
-        sentiments_arranged, sentiment_scores = get_label_summary(sentiments)
-        topics_arranged, topic_scores = get_label_summary(topics)
-        emotions_arranged, emotion_scores = get_label_summary(emotions)
-        _, irony_scores = get_label_summary(irony)
-        _, offensive_scores = get_label_summary(offensives)
-        _, hate_scores = get_label_summary(hates)
-        i = 0
-        for id in posts.keys():
-            posts[id].update({
-                "context" : contexts[id],
-                "sentiment" : sentiments_arranged[i],
-                "topics" : topics_arranged[i],
-                "emotions" : emotions_arranged[i],
-                "irony" : irony[i],
-                "offensive" : offensives[i],
-                "hate" : hates[i]
-            })
-            i += 1
-
-        analysis = {
-            "sentiment" : sentiment_scores,
-            "topics" : topic_scores,
-            "emotions" : emotion_scores,
-            "irony" : irony_scores,
-            "offensive" : offensive_scores,
-            "hate" : hate_scores
-        }
-        db.child("Analysis").child(account_id).set(analysis)
-        db.child("TopPosts").child(account_id).update(posts)
-        accountData["analysis"] = analysis
-        accountData["posts"].update(posts)
-        return Response({
+    # first check if cached result exists...
+    accountData = getAccountData(accountHandle)
+    account_id = accountData["profile"]["accountID"]
+    cached = db.child("Analysis").child(account_id).get().val()
+    if cached is not None:
+        print("Found cached data in Firebase")
+        return {
             "profile" : accountData["profile"],
-            "analysis" : analysis,
+            "analysis" : cached
+        }
+
+    # first get base account data + initialize models used
+    print(f"Generating new analysis of user: {accountHandle}")
+    img_processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+    img_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+    sentiment_pipeline = pipeline("text-classification", model=BASE_MODEL)
+    irony_pipeline = pipeline("text-classification", model=IRONY_MODEL)
+    topic_pipeline = pipeline("text-classification", model=TOPIC_MODEL, top_k=5)
+    emotion_pipeline = pipeline("text-classification", model=EMOTION_MODEL, top_k=3)
+    offensive_pipeline = pipeline("text-classification", model=OFFENSIVE_MODEL)
+    hate_pipeline = pipeline("text-classification", model=HATE_MODEL)
+
+    # get full context of each post (image desc & quote tweets if applicable)
+    posts = accountData["posts"]
+    contexts = {}
+    for id, post in posts.items():
+        contexts[id] = get_post_content(post, img_processor, img_model)
+
+    # use models to get analyses of posts
+    sentiments = sentiment_pipeline(list(contexts.values()))
+    irony = irony_pipeline(list(contexts.values()))
+    topics = topic_pipeline(list(contexts.values()))
+    emotions = emotion_pipeline(list(contexts.values()))
+    offensives = offensive_pipeline(list(contexts.values()))
+    hates = hate_pipeline(list(contexts.values()))
+
+    sentiments_arranged, sentiment_scores = get_label_summary(sentiments)
+    topics_arranged, topic_scores = get_label_summary(topics)
+    emotions_arranged, emotion_scores = get_label_summary(emotions)
+    _, irony_scores = get_label_summary(irony)
+    _, offensive_scores = get_label_summary(offensives)
+    _, hate_scores = get_label_summary(hates)
+    i = 0
+    for id in posts.keys():
+        posts[id].update({
+            "context" : contexts[id],
+            "sentiment" : sentiments_arranged[i],
+            "topics" : topics_arranged[i],
+            "emotions" : emotions_arranged[i],
+            "irony" : irony[i],
+            "offensive" : offensives[i],
+            "hate" : hates[i]
         })
+        i += 1
 
-# just get the basic account data
-class AccountSummary(APIView):
-    def get(self, request, accountHandle):
-        """ Return Twitter account summary cached in Firebase or generate new one
+    analysis = {
+        "sentiment" : sentiment_scores,
+        "topics" : topic_scores,
+        "emotions" : emotion_scores,
+        "irony" : irony_scores,
+        "offensive" : offensive_scores,
+        "hate" : hate_scores
+    }
+    db.child("Analysis").child(account_id).set(analysis)
+    db.child("TopPosts").child(account_id).update(posts)
+    accountData["analysis"] = analysis
+    accountData["posts"].update(posts)
+    return {
+        "profile" : accountData["profile"],
+        "analysis" : analysis,
+    }
 
-            This includes the basic profile info as well as the top 20 posts
-            from that account, with all relevant statistics as well. """
-
-        return Response(getAccountData(accountHandle)["profile"])
-    
 def getAccountData(accountHandle):
     # TODO: first check if account even exists...
         # if not, don't waste time/API costs doing this stuff...
@@ -201,11 +200,10 @@ def getAccountData(accountHandle):
     cached = db.child("Accounts").child(accountHandle).get().val()
     if cached is not None:
         print("Found cached data in Firebase")
-        data = {
+        return {
             "profile" : cached,
             "posts" : db.child("TopPosts").child(cached["accountID"]).get().val()
         }
-        return data
     else:
         # if no valid entry, get most relevant posts from that account
         request = {
@@ -277,12 +275,29 @@ def getAccountData(accountHandle):
                         "created" : tweet["created_at"], "lang" : tweet["lang"]
                     }
                 }
+
+                try:
+                    post["quote"]["post"]["media_url"] = ""
+                except:
+                    print("     Quote tweet w/ no media")
             except:
                 print("        No quoted tweet related or failed to parse")
 
             data["posts"][item["id"]] = post
 
         # once finished parsing API response, cache profile + posts in Firebase (with last updated date)
-        db.child("Accounts").child(accountHandle).set(data["profile"])
-        db.child("TopPosts").child(data["profile"]["accountID"]).set(data["posts"])
+        db.child("Accounts").child(accountHandle).update(data["profile"])
+        db.child("TopPosts").child(data["profile"]["accountID"]).update(data["posts"])
         return data
+    
+def backend_listener():
+    print("Backend initialized. Listening for incoming API/analysis requests")
+
+    # TODO: should listen for requests added in Firebase table "Requests"
+
+    # if active requests, pop top one (FIFO) 
+        # do twitter API request if no data
+        # else do analysis
+
+if __name__ == '__main__':
+    backend_listener()

@@ -4,6 +4,8 @@ import { EmotionAnalysis, HateAnalysis, IronyAnalysis, OffensiveAnalysis, Sentim
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 
+const MIN_PERCENT_THRESHOLD = 0.02 // cutoff for showing in donut
+
 @Component({
   selector: 'analysis-donut',
   imports: [MatIconModule, MatCardModule, NgApexchartsModule],
@@ -56,25 +58,14 @@ export class AnalysisDonutComponent implements OnChanges{
 
   @ViewChild("chart")chart!: ChartComponent;
   public chartOptions: ApexOptions = {
-    chart: {
-      type: "donut",
-      width: "100%"
-    },
-    series: [],
-    labels: [],
-    colors: [],
-    legend: {
-      show: false,
-      position: 'bottom'
-    },
+    chart: { type: "donut", width: "100%" },
+    series: [], labels: [], colors: [],
+    legend: { show: false },
     responsive: [{
       breakpoint: 480,
       options: {
         chart: { width: 200 },
-        legend: {
-          show: true,
-          position: "bottom"
-        }
+        legend: { show: false }
       }
     }]
   };
@@ -123,26 +114,43 @@ export class AnalysisDonutComponent implements OnChanges{
         analysis['diaries_&_daily_life'], analysis.family, analysis['fashion_&_style'], 
         analysis['film_tv_&_video'], analysis['fitness_&_health'], analysis['food_&_dining'],
         analysis.gaming, analysis['learning_&_educational'], analysis.music,
-        analysis['news_&_social_concern'], analysis.other_hobbies, analysis.relationships,
-        analysis['science_&_technology'], analysis.sports, analysis['travel_&_adventure'],
-        analysis['youth_&_student_life']
+        analysis['news_&_social_concern'], analysis.relationships, analysis['science_&_technology'],
+        analysis.sports, analysis['travel_&_adventure'], analysis['youth_&_student_life']
       ]
       labels = [
         "Arts", "Business", "Celebrity/Pop Culture",
         "Personal Life", "Family", "Fashion/Style",
         "Film/Video", "Fitness/Health", "Food",
         "Gaming", "Education", "Music",
-        "News/Social Concern", "Other", "Relationships",
-        "Science", "Sports", "Travel", "Youth/Student Life"
+        "News/Social Concern", "Relationships", "Science",
+        "Sports", "Travel", "Youth/Student Life"
       ]
       colors = [
         this.hexColor["red"], this.hexColor["gold"], this.hexColor["yellow"], 
         this.hexColor["pink"], this.hexColor["light-blue"], this.hexColor["maroon"],
         this.hexColor["dark-blue"], this.hexColor["green"], this.hexColor["brown"], 
         this.hexColor["blue"], this.hexColor["dark-red"], this.hexColor["light-green"],
-        this.hexColor["light-red"], this.hexColor["gray"], this.hexColor["gold"], 
-        this.hexColor["dark-green"], this.hexColor["orange"], this.hexColor["teal"], this.hexColor["light-purple"]
+        this.hexColor["light-red"], this.hexColor["gold"], this.hexColor["dark-green"],
+        this.hexColor["orange"], this.hexColor["teal"], this.hexColor["light-purple"]
       ]
+
+      var other = analysis.other_hobbies
+      for(var i = 0; i < data.length; i++){
+        if( data[i] < MIN_PERCENT_THRESHOLD){
+          other += data[i];
+          data.splice(i, 1);
+          labels.splice(i, 1);
+          colors.splice(i, 1);
+          i--;
+        }
+      }
+      const sortedIndices = data.map((val, i) => ({ val, i })).sort((a, b) => a.val - b.val).map(item => item.i);
+      data = sortedIndices.map(i => data[i])
+      labels = sortedIndices.map(i => labels[i])
+      colors = sortedIndices.map(i => colors[i])
+      data.unshift(other)
+      labels.unshift("Other")
+      colors.unshift(this.hexColor["gray"])
     } else {
       console.error("Unrecognized input in analysis-donut...")
       return;
@@ -155,13 +163,8 @@ export class AnalysisDonutComponent implements OnChanges{
         type: "donut",
         width: "100%"
       },
-      series: data,
-      labels: labels,
-      colors: colors,
-      legend: {
-        show: false,
-        position: 'bottom',
-      },
+      series: data, labels: labels, colors: colors,
+      legend: { show: false },
       responsive: [{
         breakpoint: 480,
         options: {
