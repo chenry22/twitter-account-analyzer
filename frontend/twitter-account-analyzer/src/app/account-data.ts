@@ -50,6 +50,17 @@ export interface TopicAnalysis {
     relationships: number
 }
 
+export interface Frequency {
+    word: string,
+    abs_freq: number,
+    rel_value: number,
+    wtd_freq: number,
+}
+export interface FrequencyAnalysis {
+    bigrams: Map<Number, Frequency>,
+    words: Map<Number, Frequency>,
+}
+
 
 
 export interface Analysis {
@@ -59,6 +70,7 @@ export interface Analysis {
     offensive: OffensiveAnalysis,
     sentiment: SentimentAnalysis,
     topics: TopicAnalysis,
+    word_frequencies: FrequencyAnalysis,
 }
 export interface Account {
     accountID: string,

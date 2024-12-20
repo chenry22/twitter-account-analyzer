@@ -12,7 +12,8 @@ const MIN_PERCENT_THRESHOLD = 0.02 // cutoff for showing in donut
   templateUrl: './analysis-donut.component.html',
   styleUrl: './analysis-donut.component.css'
 })
-export class AnalysisDonutComponent implements OnChanges{
+export class AnalysisDonutComponent implements OnChanges {
+  // dictionaries for consistent mapping of things
   hexColor: {[key: string]: string} = {
     "red" : "#FF2C4D", "gray" : "#b6b2bd", "green" : "#29d038",
     "purple" : "#7e3994", "light-green" : "#69ff74", "blue" : "#4b53da",
@@ -20,7 +21,7 @@ export class AnalysisDonutComponent implements OnChanges{
     "gold" : "#e4cb0e", "yellow" : "#f3eb21", "pink" : "#fb89dd",
     "maroon" : "#4c1c73", "brown" : "#bf6121", "dark-red" : "#901120",
     "light-red" : "#fd4d5d", "teal" : "#3ccebe", "light-purple" : "#d397fb",
-    "dark-green" : "#2b5832"
+    "dark-green" : "#2b5832", "dark-purple" : "#5c0436"
   }
   labelToIcon: {[key: string]: string} = {
     "Negative" : "sentiment_dissatisfied", "Neutral" : "sentiment_neutral", "Positive" : "sentiment_satisfied",
@@ -129,7 +130,7 @@ export class AnalysisDonutComponent implements OnChanges{
         this.hexColor["red"], this.hexColor["gold"], this.hexColor["yellow"], 
         this.hexColor["pink"], this.hexColor["light-blue"], this.hexColor["maroon"],
         this.hexColor["dark-blue"], this.hexColor["green"], this.hexColor["brown"], 
-        this.hexColor["blue"], this.hexColor["dark-red"], this.hexColor["light-green"],
+        this.hexColor["blue"], this.hexColor["dark-red"], this.hexColor["dark-purple"],
         this.hexColor["light-red"], this.hexColor["gold"], this.hexColor["dark-green"],
         this.hexColor["orange"], this.hexColor["teal"], this.hexColor["light-purple"]
       ]

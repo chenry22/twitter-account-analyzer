@@ -1,6 +1,5 @@
 /backend/api_key.txt
 /backend/firebase.json
-**/environments
 *.vscode
 *.DS_Store
 

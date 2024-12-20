@@ -1,9 +1,10 @@
 #account-container {
-    margin: 10px 40px;
+    margin: 10px 20px;
 }
 .header-container {
     margin: 20px 70px;
 }
+
 #profile-card {
     padding: 20px;
 }
@@ -13,9 +14,14 @@
     border: 2px solid darkslategray;
 }
 .account-info {
-    margin: 0 20px;
+    margin: 0 30px;
+    align-items: center;
     gap: 50px;
 }
+.larger-text {
+    font-size: 20px;
+}
+
 .align-vertical {
     align-items: center;
 }
@@ -23,7 +29,7 @@
     margin-top: 20px;
 }
 #card-spacer {
-    height: 40px;
+    height: 20px;
 }
 #stats-card {
     padding: 20px;

@@ -1,13 +1,15 @@
-import { Component, Injectable, inject, OnInit } from '@angular/core';
+import { Component, Injectable, inject, OnInit, ChangeDetectionStrategy, Inject } from '@angular/core';
 import { Account, Analysis } from '../account-data';
-import { Database, ref, get, push } from '@angular/fire/database'
-
+import { Database, ref, get, update } from '@angular/fire/database'
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogActions, MatDialogClose, MAT_DIALOG_DATA,
+  MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog'
 import { AnalysisDonutComponent } from '../analysis-donut/analysis-donut.component';
+import { FrequencyAnalysisComponent } from '../frequency-analysis/frequency-analysis.component';
 
 // TODO: fix injectable error thing idk might be a bug in the actual AngularFire library as far as I can tell from reading forums
 @Injectable({providedIn: 'root'})
@@ -26,11 +28,9 @@ export class AccountDataService {
       }
       return accountData
     }
-
-    push(ref(this.db, "Requests"), {
-      created : Date.now(),
-      scrapeAccount : false,
-      username : username
+    // if no cached entry, send request to create one
+    update(ref(this.db, "Requests/" + username), {
+      requested : Date.now()
     });
     return null;
   }
@@ -52,15 +52,14 @@ export class AccountDataService {
         'other_hobbies': 0, 'youth_&_student_life': 0, family: 0, gaming: 0, relationships: 0}, ...data.topics}
       return {
         emotions: emotions, hate: hates, irony: irony,
-        offensive: offensive, sentiment: sentiment, topics: topics
+        offensive: offensive, sentiment: sentiment, topics: topics,
+        word_frequencies: data.word_frequencies
       }
     }
 
     // add request to scrape + analyze account
-    push(ref(this.db, "Requests"), {
-      created : Date.now(),
-      scrapeAccount : true,
-      username : username
+    update(ref(this.db, "Requests/" + username), {
+      requested : Date.now()
     });
     return null;
   }
@@ -68,42 +67,67 @@ export class AccountDataService {
 
 @Component({
   selector: 'app-account-data',
-  imports: [MatIconModule, MatButtonModule,
-    MatCardModule, AnalysisDonutComponent],
+  imports: [MatIconModule, MatButtonModule, MatCardModule,
+    AnalysisDonutComponent,FrequencyAnalysisComponent],
   templateUrl: './account-data.component.html',
   styleUrl: './account-data.component.css'
 })
 export class AccountDataComponent implements OnInit {
   constructor(private router: Router, private route: ActivatedRoute, private data: AccountDataService) { }
+  readonly dialog = inject(MatDialog);
 
   username: string = "-";
+  accountURL: string = "";
   pfpLarge: string = "";
   accountData: Account | null = null;
   analysis: Analysis | null = null;
 
   async ngOnInit() {
     this.username = this.route.snapshot.paramMap.get('username') || '';
-    // TODO: unlock this, just for testing so i dont make any accidental API calls...
-    if(["lisco_2000", "mobilebosco"].indexOf(this.username) > -1){
-      // don't send invalid requests...
-      try {
-        const account = await this.data.getAccountData(this.username);
-        if (account) {
-          this.accountData = account;
-          this.pfpLarge = this.accountData.pfpURL.replace("_normal", "_400x400");
-          const analysis = await this.data.getAccountAnalysis(this.username, this.accountData);
-          this.analysis = analysis;
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
+    try {
+      const account = await this.data.getAccountData(this.username);
+      if (account) {
+        this.accountData = account;
+        this.pfpLarge = this.accountData.pfpURL.replace("_normal", "_400x400");
+        this.accountURL = account.url
+
+        const analysis = await this.data.getAccountAnalysis(this.username, this.accountData);
+        this.analysis = analysis;
+      } else {
+        this.showUserMessage()
       }
-    } else {
-      console.log("invalid username request")
-      this.backToMain()
+    } catch (error) {
+      console.error('Error fetching data:', error);
     }
+  }
+
+  showUserMessage(): void {
+    const dialogRef = this.dialog.open(RequestSentDialog, {
+      width: '350px',
+      data: {
+        username: this.username
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(_ => {
+      this.backToMain()
+    })
   }
 
   backToMain(): void {
     this.router.navigate(['/'])
   }
+}
+
+@Component({
+  selector: 'request-sent-dialog',
+  templateUrl: "request-sent-dialog.html",
+  imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class RequestSentDialog {
+  constructor(public dialogRef: MatDialogRef<RequestSentDialog>, 
+    @Inject(MAT_DIALOG_DATA) public data: any) {
+      console.log(data)
+    }
 }

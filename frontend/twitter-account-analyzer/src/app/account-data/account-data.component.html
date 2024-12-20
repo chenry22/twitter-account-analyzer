@@ -9,8 +9,8 @@
                 <img class="avatar" mat-card-avatar [src]="pfpLarge" alt="profile picture">
                 <div class="hstack account-info">
                     <div>
-                        <p><b>{{ accountData?.displayName ?? '-' }}</b></p>
-                        <p><i>&#64;{{ username }}</i></p>
+                        <p class="larger-text"><b>{{ accountData?.displayName ?? '-' }}</b></p>
+                        <p style="color: rgb(23, 74, 125);"><i>&#64;{{ username }}</i></p>
                     </div>
                     <div>
                         <p><b>{{ accountData?.followers ?? '-' }}</b></p>
@@ -36,7 +36,7 @@
             </mat-card-content>
 
             <mat-card-actions class="bottom-card-button">
-                <button mat-button>Visit Profile</button>
+                <a mat-flat-button [href]="accountURL" target="_blank">Visit Profile</a>
             </mat-card-actions>
         </mat-card>
 
@@ -44,7 +44,7 @@
 
         <mat-card id="stats-card" appearance="outlined">
             <mat-card-header>
-                <mat-card-title><b>Sentiment Analysis</b></mat-card-title>
+                <mat-card-title><b>Account Analysis</b></mat-card-title>
                 <mat-card-subtitle><i>Last Updated: {{ accountData?.lastUpdated ?? '---' }}</i></mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
@@ -57,9 +57,19 @@
                     <analysis-donut [analysis]="analysis?.offensive"></analysis-donut>
                 </div>
             </mat-card-content>
-            <mat-card-actions class="bottom-card-button">
-                <button mat-button>Save</button>
-            </mat-card-actions>
+        </mat-card>
+
+        <div id="card-spacer"></div>
+
+        <mat-card id="freq-card" appearance="outlined">
+            <mat-card-header>
+                <mat-card-title><b>Common Words/Phrases</b></mat-card-title>
+                <mat-card-subtitle><i>Last Updated: {{ accountData?.lastUpdated ?? '---' }}</i></mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <frequency-analysis [wordFreqs]="analysis?.word_frequencies"></frequency-analysis>
+            </mat-card-content>
         </mat-card>
     </div>
 </div>
+<div style="height: 100px"></div>

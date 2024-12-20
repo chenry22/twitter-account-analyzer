@@ -367,7 +367,9 @@ if __name__ == '__main__':
     mode = input("\nManual (0) or automatic (1) mode? ")
     if mode == '0':
         while True:
-            username = input("Enter account username: ")
+            username = input("Enter account username (or nothing to exit): ")
+            if len(username) == 0:
+                exit()
             choice = input("(0) Scrape or (1) analyze account?: ")
             force_reload = bool(input("   Force reload of data? (1) y or (0) n: "))
             if choice == '0':

@@ -4,8 +4,7 @@ html, body { height: 100%; }
 body {
     margin: 0;
     font-family: Roboto,
-    "Helvetica Neue", sans-serif; 
-    padding-bottom: 100px;
+    "Helvetica Neue", sans-serif;
 }
 
 .spacer {
