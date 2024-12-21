@@ -1,5 +1,6 @@
 /backend/api_key.txt
 /backend/firebase.json
+/frontend/twitter-account-analyzer/docs
 *.vscode
 *.DS_Store
 

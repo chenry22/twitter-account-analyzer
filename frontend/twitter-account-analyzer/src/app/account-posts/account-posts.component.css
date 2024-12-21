@@ -1,0 +1,46 @@
+.handle {
+    color: rgb(38, 38, 132);
+}
+
+mat-card-header {
+    display: flex;
+    align-items: center;
+}
+
+.post-avatar {
+    margin: 0;
+    padding: 0;
+}
+.post-account-info {
+    width: 100%;
+    padding: 0 20px;
+}
+.post-account-info p {
+    margin: 8px 0;
+}
+.post {
+    padding: 10px 5px;
+}
+
+.quote-tweet {
+    margin: 10px 20px;
+}
+.quote-tweet button {
+    color: rgb(30, 151, 167);
+}
+
+.attached-image {
+    object-fit: contain;
+    max-width: 600px;
+    max-height: 500px;
+    margin-right: auto;
+    padding: 20px 30px;
+}
+
+mat-card-footer {
+    padding: 0 0 10px 10px;
+}
+mat-card-footer a {
+    font-size: small;
+    color: rgb(105, 12, 142);
+}

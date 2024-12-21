@@ -1,4 +1,5 @@
 from getpass import getpass
+from time import sleep
 
 import pyrebase
 from apify_client import ApifyClient
@@ -175,7 +176,7 @@ def getAccountAnalysis(accountHandle:str, reload_analysis:bool = False):
     if not reload_analysis:
         cached = db.child("Analysis").child(account_id).get().val()
         if cached is not None:
-            print("Found cached data in Firebase")
+            print("   Found cached data in Firebase")
             return {
                 "profile" : accountData["profile"],
                 "analysis" : cached
@@ -199,7 +200,7 @@ def getAccountAnalysis(accountHandle:str, reload_analysis:bool = False):
     for id, post in posts.items():
         contexts[id] = get_post_content(post, img_processor, img_model)
         i += 1
-        print(f"   [ {i} / {MAX_POSTS_FROM_API} posts parsed ]")
+        print(f"   [ {i} / {len(posts)} posts parsed ]")
 
     # use models to get analyses of posts
     sentiments = sentiment_pipeline(list(map(lambda x : post_stringify(x), contexts.values())))
@@ -255,7 +256,7 @@ def getAccountData(accountHandle:str, reload_data:bool = False):
     if not reload_data:
         cached = db.child("Accounts").child(accountHandle).get().val()
         if cached is not None:
-            print("Found cached data in Firebase")
+            print("   Found cached data in Firebase")
             return {
                 "profile" : cached,
                 "posts" : db.child("TopPosts").child(cached["accountID"]).get().val()
@@ -344,15 +345,27 @@ def getAccountData(accountHandle:str, reload_data:bool = False):
     db.child("Accounts").child(accountHandle).update(data["profile"], token)
     db.child("TopPosts").child(data["profile"]["accountID"]).update(data["posts"], token)
     return data
-    
+
+def request_handler(request):
+    try:
+        username = str(request["path"])[1:].lower()
+        if username == "username" or len(username) == 0:
+            return
+        print(f"New request for @{username}")
+        getAccountAnalysis(username)
+        print(f"   Finished analysis of @{username}")
+        db.child("Requests").child(username).remove(token)
+    except Exception as e:
+        print(f"   Bad request, exception thrown, skipping: {e}")
+
 def backend_listener():
-    print("     Listening for incoming API/analysis requests")
-
-    # TODO: should listen for requests in Firebase table "Requests"
-
-    # if active requests, pop top one (FIFO) 
-        # do twitter API request if no data
-        # else do analysis
+    # first handle any existing requests
+    requests = db.child("Requests").shallow().get(token)
+    for r in requests.val():
+        request_handler({ "path" : f"/{r}" })
+    # then listen for new requests
+    print("     No existing requests found- listening for incoming.")
+    db.child("Requests").stream(stream_handler=request_handler, token=token)
 
 # this is just a little manager console allowing manual or automatic running of the data manipulation
 if __name__ == '__main__':
@@ -361,8 +374,8 @@ if __name__ == '__main__':
         pword = getpass("Please authenticate w/ Firebase: ")
         user = firebase.auth().sign_in_with_email_and_password("calebhenry7095@gmail.com", pword)
         token = user["idToken"]
-    except Exception as error:
-        print("   Invalid login.")
+    except:
+        print("   Invalid login. Exiting program.")
         exit()
     mode = input("\nManual (0) or automatic (1) mode? ")
     if mode == '0':

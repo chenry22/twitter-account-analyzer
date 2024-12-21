@@ -8,8 +8,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogActions, MatDialogClose, MAT_DIALOG_DATA,
   MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog'
+
 import { AnalysisDonutComponent } from '../analysis-donut/analysis-donut.component';
 import { FrequencyAnalysisComponent } from '../frequency-analysis/frequency-analysis.component';
+import { AccountPostsComponent } from '../account-posts/account-posts.component';
 
 // TODO: fix injectable error thing idk might be a bug in the actual AngularFire library as far as I can tell from reading forums
 @Injectable({providedIn: 'root'})
@@ -29,9 +31,7 @@ export class AccountDataService {
       return accountData
     }
     // if no cached entry, send request to create one
-    update(ref(this.db, "Requests/" + username), {
-      requested : Date.now()
-    });
+    update(ref(this.db, "Requests/" + username), { requested : Date.now() });
     return null;
   }
   async getAccountAnalysis(username: string, account: Account) : Promise<Analysis | null> {
@@ -51,16 +51,13 @@ export class AccountDataService {
         'fitness_&_health': 0, 'news_&_social_concern': 0, 'travel_&_adventure': 0, 'diaries_&_daily_life': 0, 'food_&_dining': 0,
         'other_hobbies': 0, 'youth_&_student_life': 0, family: 0, gaming: 0, relationships: 0}, ...data.topics}
       return {
-        emotions: emotions, hate: hates, irony: irony,
-        offensive: offensive, sentiment: sentiment, topics: topics,
-        word_frequencies: data.word_frequencies
+        emotions: emotions, hate: hates, irony: irony, offensive: offensive,
+        sentiment: sentiment, topics: topics, word_frequencies: data.word_frequencies
       }
     }
 
     // add request to scrape + analyze account
-    update(ref(this.db, "Requests/" + username), {
-      requested : Date.now()
-    });
+    update(ref(this.db, "Requests/" + username), { requested : Date.now() });
     return null;
   }
 }
@@ -68,7 +65,7 @@ export class AccountDataService {
 @Component({
   selector: 'app-account-data',
   imports: [MatIconModule, MatButtonModule, MatCardModule,
-    AnalysisDonutComponent,FrequencyAnalysisComponent],
+    AnalysisDonutComponent, FrequencyAnalysisComponent, AccountPostsComponent],
   templateUrl: './account-data.component.html',
   styleUrl: './account-data.component.css'
 })
@@ -103,15 +100,10 @@ export class AccountDataComponent implements OnInit {
 
   showUserMessage(): void {
     const dialogRef = this.dialog.open(RequestSentDialog, {
-      width: '350px',
-      data: {
-        username: this.username
-      }
+      width: '400px',
+      data: { username: this.username }
     });
-
-    dialogRef.afterClosed().subscribe(_ => {
-      this.backToMain()
-    })
+    dialogRef.afterClosed().subscribe(_ => { this.backToMain() })
   }
 
   backToMain(): void {
@@ -127,7 +119,5 @@ export class AccountDataComponent implements OnInit {
 })
 export class RequestSentDialog {
   constructor(public dialogRef: MatDialogRef<RequestSentDialog>, 
-    @Inject(MAT_DIALOG_DATA) public data: any) {
-      console.log(data)
-    }
+    @Inject(MAT_DIALOG_DATA) public data: any) { }
 }

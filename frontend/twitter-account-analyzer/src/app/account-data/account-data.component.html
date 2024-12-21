@@ -6,7 +6,7 @@
     <div class="header-container">
         <mat-card id="profile-card" appearance="outlined">
             <mat-card-header class="align-vertical">
-                <img class="avatar" mat-card-avatar [src]="pfpLarge" alt="profile picture">
+                <img class="avatar" mat-card-avatar [src]="pfpLarge" alt="pfp">
                 <div class="hstack account-info">
                     <div>
                         <p class="larger-text"><b>{{ accountData?.displayName ?? '-' }}</b></p>
@@ -68,6 +68,18 @@
             </mat-card-header>
             <mat-card-content>
                 <frequency-analysis [wordFreqs]="analysis?.word_frequencies"></frequency-analysis>
+            </mat-card-content>
+        </mat-card>
+
+        <div id="card-spacer"></div>
+
+        <mat-card id="posts-card" appearance="outlined">
+            <mat-card-header>
+                <mat-card-title><b>Relevant Posts</b></mat-card-title>
+                <mat-card-subtitle><i>Top posts from this account according to Twitter's algorithm</i></mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <account-posts [accountData]="accountData!" [username]="username"></account-posts>
             </mat-card-content>
         </mat-card>
     </div>

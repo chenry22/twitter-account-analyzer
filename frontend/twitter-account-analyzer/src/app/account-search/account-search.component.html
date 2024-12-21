@@ -2,15 +2,12 @@
     <p>Search for a Twitter user by their account handle!</p>
     <div class="hstack">
         <span class="spacer"></span>
-        <form #form="ngForm" (ngSubmit)="onSearch(form)">
+        <form #form="ngForm" (ngSubmit)="onSearch(form)" (keydown)="onKeydown($event)">
             <mat-form-field [style.width.px]=400 appearance="outline">
                 <span id="prefix" matPrefix>&#64;</span>
-                <input matInput id="account-search" autocorrect="off" placeholder="account-handle" name="username" [(ngModel)]="username" required minlength="3"/>
-                <mat-error *ngIf="form.submitted && !this.username">
-                    Username is required.
-                </mat-error>
-                <mat-error *ngIf="form.submitted && username?.length ?? 0 < 3">
-                    Username must be at least 3 characters.
+                <input matInput id="account-search" autocorrect="off" placeholder="account-handle" name="username" [(ngModel)]="username" required minlength="3" maxlength="15"/>
+                <mat-error *ngIf="!validHandle(username)">
+                    Invalid username.
                 </mat-error>
                 <button matSuffix mat-icon-button aria-label="Search" id="search-button">
                     <mat-icon>search</mat-icon>

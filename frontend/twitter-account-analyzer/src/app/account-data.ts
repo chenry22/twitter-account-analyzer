@@ -90,3 +90,49 @@ export interface AccountAnalysis {
     profile: Account,
     analysis: Analysis
 }
+
+export interface QuoteTweet {
+    contents: string,
+    created: string,
+    media_url?: string,
+
+    boomarks: number,
+    likes: number,
+    quotes: number,
+    replies: number,
+    retweets: number,
+    views: number,
+}
+export interface Post {
+    attachments? : {
+        0 : {
+            url : string
+        }
+    }
+    quote?: {
+        account: {
+            username: string,
+            displayName: string,
+            pfpURL: string,
+        },
+        post: QuoteTweet
+    }
+
+    boomarks: number,
+    likes: number,
+    quotes: number,
+    replies: number,
+    retweets: number,
+    views: number,
+
+    contents: string,
+    created: string,
+    url: string,
+
+    emotions: Map<String, Number>,
+    sentiment: Map<String, Number>,
+    topics: Map<String, Number>,
+    hate: { label: string, score: number },
+    irony: { label: string, score: number },
+    offensive: { label: string, score: number },
+}

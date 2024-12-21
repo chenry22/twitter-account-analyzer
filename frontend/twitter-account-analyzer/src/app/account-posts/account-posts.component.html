@@ -1,0 +1,63 @@
+<div id="posts-container">
+    <div class="vstack" *ngFor="let post of posts">
+        <div class="post">
+            <mat-card appearance="outlined">
+                <mat-card-header>
+                    <img mat-card-avatar class="post-avatar" [src]="accountData?.pfpURL" alt="pfp">
+                    <div class="hstack post-account-info">
+                        <div>
+                            <p class="larger-text"><b>{{ accountData?.displayName ?? '-' }}</b></p>
+                            <p style="color: rgb(23, 74, 125);"><i>&#64;{{ username }}</i></p>
+                        </div>
+                        <div class="spacer"></div>
+                        <div>
+                            <p><i>{{ post.created }}</i></p>
+                        </div>
+                    </div>
+                </mat-card-header>
+                <mat-card-content>
+                    <p>{{ post.contents }}</p>
+                    <img class="attached-image" *ngIf="post.attachments" mat-card-image [src]="post.attachments['0'].url" alt="attachment">
+                    <mat-card class="quote-tweet" *ngIf="post.quote">
+                        <mat-card-header>
+                            <img mat-card-avatar class="post-avatar" [src]="post.quote.account.pfpURL" alt="pfp">
+                            <div class="hstack post-account-info">
+                                <div>
+                                    <p class="larger-text"><b>{{ post.quote.account.displayName }}</b></p>
+                                    <p style="color: rgb(23, 74, 125);"><i>&#64;{{ post.quote.account.username }}</i></p>
+                                </div>
+                                <div class="spacer"></div>
+                                <div>
+                                    <p><i>{{ post.quote.post.created }}</i></p>
+                                </div>
+                            </div>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <p>{{ post.quote.post.contents }}</p>
+                        </mat-card-content>
+                        <img class="attached-image" *ngIf="post.quote.post.media_url" mat-card-image [src]="post.quote.post.media_url" alt="attachment">
+                        <mat-card-actions>
+                            <button mat-button>{{ numFormat(post.quote.post.likes) }} <mat-icon>favorite</mat-icon></button>
+                            <button mat-button>{{ numFormat(post.quote.post.retweets) }} <mat-icon>cached</mat-icon></button>
+                            <button mat-button>{{ numFormat(post.quote.post.replies) }} <mat-icon>comment</mat-icon></button>
+                            <button mat-button>{{ numFormat(post.quote.post.boomarks) }} <mat-icon>bookmark</mat-icon></button>
+                            <button mat-button>{{ numFormat(post.quote.post.views) }} <mat-icon>visibility</mat-icon></button>
+                        </mat-card-actions>
+                    </mat-card>
+                </mat-card-content>
+                <mat-card-actions>
+                    <button mat-button>{{ numFormat(post.likes) }} <mat-icon>favorite</mat-icon></button>
+                    <button mat-button>{{ numFormat(post.retweets) }} <mat-icon>cached</mat-icon></button>
+                    <button mat-button>{{ numFormat(post.replies) }} <mat-icon>comment</mat-icon></button>
+                    <button mat-button>{{ numFormat(post.boomarks) }} <mat-icon>bookmark</mat-icon></button>
+                    <button mat-button>{{ numFormat(post.views) }} <mat-icon>visibility</mat-icon></button>
+                </mat-card-actions>
+                <mat-card-footer>
+                    <a mat-raised-button [href]="post.url" target="_blank"><i>View Original Post</i></a>
+                </mat-card-footer>
+            </mat-card>
+        </div>
+    </div>
+
+    <button mat-flat-button (click)="loadPosts(accountData!)">Load More</button>
+</div>
