@@ -15,17 +15,23 @@ const POSTS_PER_LOAD = 10
 @Injectable({providedIn: 'root'})
 export class PostsDataService {
   constructor(private db: Database) {}
+  accountID: string = ""
   maxLikes: number = Number.MAX_VALUE
   posts: Map<String, Post> = new Map<String, Post>()
 
   async getPosts(accountID: string): Promise<Array<Post> | null> {
+    if(accountID != this.accountID){
+      this.posts.clear()
+      this.maxLikes = Number.MAX_VALUE
+    }
+    this.accountID = accountID;
+
     const postsQuery = query(ref(this.db, "TopPosts/" + accountID),
       orderByChild("likes"), endAt(this.maxLikes), limitToLast(POSTS_PER_LOAD))
     const snapshot = await get(postsQuery)
     if(snapshot.exists()){
       var min = this.maxLikes
       var newPosts = snapshot.val()
-      console.log(newPosts)
       Object.keys(newPosts).forEach((id) => {
         this.posts.set(id, newPosts[id])
         if(newPosts[id].likes < min){
@@ -52,15 +58,16 @@ export class AccountPostsComponent implements OnChanges {
   @Input() accountData: Account | undefined;
 
   ngOnChanges(changes: SimpleChanges): void {
-      if(changes['accountData'].currentValue){
-        this.loadPosts(changes['accountData'].currentValue)
-      }
+    if(changes['accountData'].currentValue){
+      this.loadPosts(changes['accountData'].currentValue)
+    }
   }
 
   posts: Array<Post> = []
   loadPosts(accountData: Account) {
     this.postData.getPosts(accountData.accountID).then((posts) => {
       if(posts != null){
+        console.log(posts)
         this.posts = posts
       }
     })

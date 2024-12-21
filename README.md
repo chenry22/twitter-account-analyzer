@@ -23,3 +23,4 @@ Right now, the backend can handle requests to get the basic data from a Twitter 
 - Add list of top users on front page (like top 5 perhaps) and most recently updated
 - Cache requests to local storage and have listener update when firebase is updated (on main page)
 - About page
+- boomarks (typo but I'm sunk cost fallacy (unfortunate))
