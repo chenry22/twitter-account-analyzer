@@ -1,4 +1,6 @@
 # Twitter Account Analyzer
+[**Visit the current page here!**](https://chenry22.github.io/twitter-account-analyzer/)
+
 - *Tech Stack*
     - Firebase Database
     - Single Python script as 'backend' (in the future it would be cool to have something users actually directly connect to for sending requests for data, but I don't want to deal with paying to host something like that (overhead of HuggingFace model caches makes cost annoying))
