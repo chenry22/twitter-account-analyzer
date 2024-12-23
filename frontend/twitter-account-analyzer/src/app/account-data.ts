@@ -12,7 +12,13 @@ export interface EmotionAnalysis {
     trust: number,
 }
 export interface HateAnalysis {
-    hate: number,
+    hate_gender: number,
+    hate_race: number,
+    hate_sexuality: number,
+    hate_religion: number,
+    hate_origin: number,
+    hate_disability: number,
+    hate_age: number
     not_hate: number,
 }
 export interface IronyAnalysis {

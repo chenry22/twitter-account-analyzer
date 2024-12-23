@@ -42,7 +42,8 @@ export class AccountDataService {
       // TODO: this default values thing is stupid but I think its actually the simplest solution unfortunately
       var emotions = { ...{anger: 0, anticipation: 0, disgust: 0, fear: 0, joy: 0,
         love: 0, optimism: 0, pessimism: 0, sadness: 0, surprise: 0, trust: 0}, ...data.emotions }
-      var hates = {...{hate: 0, not_hate: 0}, ...data.hate}
+      var hates = {...{hate_age: 0, hate_disability: 0, hate_gender: 0,
+        hate_origin: 0, hate_race: 0, hate_religion: 0, hate_sexuality: 0, not_hate: 0}, ...data.hate}
       var irony = {...{irony: 0, non_irony: 0}, ...data.irony}
       var offensive = {...{offensive: 0, 'non-offensive': 0}, ...data.offensive}
       var sentiment = {...{negative: 0, neutral: 0, positive: 0}, ...data.sentiment}

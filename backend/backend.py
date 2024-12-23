@@ -26,6 +26,7 @@ OFFENSIVE_MODEL = "cardiffnlp/twitter-roberta-base-offensive"
 HATE_MODEL = "cardiffnlp/twitter-roberta-large-hate-latest"
 
 MAX_POSTS_FROM_API = 100 # this costs real life money, so I'm being a little restrictive
+MAX_TOKENS = 514 # max tokens the models can handle
 
 # set up necessary API clients
 with open('firebase.json', 'r') as f:
@@ -95,14 +96,14 @@ def get_post_content(post: dict, img_processor, img_model) -> dict:
 
 def post_stringify(post: dict, include_quote: bool = False) -> str:
     ''' Stringifies a reduced post dictionary '''
-    content = f"(image of {post['media']}) {post['main']}" if 'media' in post.keys() else post['main']
+    content: str = f"(image of {post['media']}) {post['main']}" if 'media' in post.keys() else post['main']
     if include_quote and 'quote' in post.keys():
         if 'quote_media' in post.keys():
-            return f"Context: (image of {post['quote_media']}) {post['quote']} Response: {content}"
+            return f"Context: (image of {post['quote_media']}) {post['quote']} Response: {content}"[:MAX_TOKENS]
         else:
-            return f"Context: {post['quote']} Response: {content}"
+            return f"Context: {post['quote']} Response: {content}"[:MAX_TOKENS]
     else:
-        return content
+        return content[:MAX_TOKENS]
 
 def get_label_summary(items):
     ''' Converts a list of items' attributes to a dictionary of these attributes and the overall partition of these attributes in the collection 
@@ -358,15 +359,6 @@ def request_handler(request):
     except Exception as e:
         print(f"   Bad request, exception thrown, skipping: {e}")
 
-def backend_listener():
-    # first handle any existing requests
-    requests = db.child("Requests").shallow().get(token)
-    for r in requests.val():
-        request_handler({ "path" : f"/{r}" })
-    # then listen for new requests
-    print("     No existing requests found- listening for incoming.")
-    db.child("Requests").stream(stream_handler=request_handler, token=token)
-
 # this is just a little manager console allowing manual or automatic running of the data manipulation
 if __name__ == '__main__':
     try:
@@ -390,6 +382,12 @@ if __name__ == '__main__':
             else:
                 getAccountAnalysis(username, force_reload)
     elif mode == '1':
-        backend_listener()
+        # first handle any existing requests
+        request_list = db.child("Requests").shallow().get(token)
+        for r in request_list.val():
+            request_handler({ "path" : f"/{r}" })
+        # then listen for new requests
+        print("     No existing requests found- listening for incoming.")
+        db.child("Requests").stream(stream_handler=request_handler, token=token)
     else:
         print("Unrecognized input")

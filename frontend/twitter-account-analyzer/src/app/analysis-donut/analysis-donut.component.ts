@@ -41,7 +41,7 @@ export class AnalysisDonutComponent implements OnChanges {
   // there's probably a better way to do this, I'm not aware of it though :(
   isSentimentAnalysis(value: SentimentAnalysis): value is SentimentAnalysis  { return value.positive != null; }
   isEmotionAnalysis(value: EmotionAnalysis): value is EmotionAnalysis  { return value.anger != null; }
-  isHateAnalysis(value: HateAnalysis): value is HateAnalysis  { return value.hate != null; }
+  isHateAnalysis(value: HateAnalysis): value is HateAnalysis  { return value.not_hate != null; }
   isIronyAnalysis(value: IronyAnalysis): value is IronyAnalysis  { return value.irony != null; }
   isOffensiveAnalysis(value: OffensiveAnalysis): value is OffensiveAnalysis  { return value.offensive != null; }
   isTopicAnalysis(value: TopicAnalysis): value is TopicAnalysis  { return value['arts_&_culture'] != null; }
@@ -95,9 +95,13 @@ export class AnalysisDonutComponent implements OnChanges {
         this.hexColor["yellow"], this.hexColor["pink"]];
     } else if(this.isHateAnalysis(analysis)){
       this.title = "Hateful Content"
-      data = [analysis.hate, analysis.not_hate]
-      labels = ["Hate", "Not Hate"]
-      colors = [this.hexColor["red"], this.hexColor["green"]]
+      data = [analysis.hate_age, analysis.hate_disability, analysis.hate_gender,
+        analysis.hate_origin, analysis.hate_race, analysis.hate_religion,
+        analysis.hate_sexuality, analysis.not_hate]
+      labels = ["Age", "Disability", "Gender", 
+        "Origin", "Race", "Religion", "Sexuality", "Not Hate"]
+      colors = ["#ff4751", "#f23d46", "#e63039",
+        "#db232c", "#d1151e", "#ba0912", "#a3030b", this.hexColor["green"]]
     } else if(this.isIronyAnalysis(analysis)){
       this.title = "Irony"
       data = [analysis.irony, analysis.non_irony]
